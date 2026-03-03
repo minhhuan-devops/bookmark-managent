@@ -1,0 +1,30 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a simple bookmark management API.
+  title: Bookmark Management API
+  version: "1.0"
+paths:
+  /gen-pass:
+    get:
+      consumes:
+      - application/json
+      description: GeneratePassword
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: GeneratePassword
+      tags:
+      - password
+schemes:
+- http
+swagger: "2.0"

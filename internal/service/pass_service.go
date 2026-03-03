@@ -14,6 +14,7 @@ const (
 type passwordService struct {
 }
 
+//go:generate mockery --name Password --filename pass_service.go
 type Password interface {
 	GeneratePassword() (string, error)
 }
@@ -22,11 +23,18 @@ func NewPassword() Password {
 	return &passwordService{}
 }
 
-// GeneratePassword generates a random password of length 16 using a cryptographically secure random number generator.
+// @Summary GeneratePassword
+// @Description GeneratePassword
+// @Tags password
+// @Accept json
+// @Produce json
+// @Success 200 {string} string
+// @Failure 500 {string} string
+// @Router /gen-pass [get]
 func (s *passwordService) GeneratePassword() (string, error) {
 	var strBuilder bytes.Buffer
 
-	for i := 0; i < passLength; i++ {
+	for i := 1; i <= passLength; i++ {
 		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
 		if err != nil {
 			return "", err

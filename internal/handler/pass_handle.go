@@ -15,7 +15,7 @@ type Password interface {
 	GenPass(c *gin.Context)
 }
 
-func NewPassword(svc service.Password) Password {
+func NewPasswordHandler(svc service.Password) Password {
 	return &passwordHandler{svc: svc}
 }
 
