@@ -28,6 +28,7 @@ func TestPasswordEndpoint(t *testing.T) {
 				api.ServeHTTP(respRecorder, req)
 				return respRecorder
 			},
+			
 			expectedStatus: http.StatusOK,
 			expectedLen:    16,
 		},

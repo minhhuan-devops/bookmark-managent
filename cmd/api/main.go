@@ -9,7 +9,7 @@ import (
 // @version 1.0
 // @description This is a simple bookmark management API.
 // @host localhost:8080
-// @BasePath /api/v1
+// @BasePath /
 // @schemes http
 func main() {
 	// load env
@@ -17,7 +17,7 @@ func main() {
 		panic(err)
 	}
 
-	cfg, err := api.NewConfig("ABC")
+	cfg, err := api.NewConfig("")
 	if err != nil {
 		panic(err)
 	}

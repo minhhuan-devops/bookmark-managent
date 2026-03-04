@@ -19,12 +19,20 @@ func NewPasswordHandler(svc service.Password) Password {
 	return &passwordHandler{svc: svc}
 }
 
+// @Summary Generate Password
+// @Tags password
+// @Produce json
+// @Success 200 {object} genPassResponse
+// @Failure 500 {object} errorResponse
+// @Router /gen-pass [get]
 func (h *passwordHandler) GenPass(c *gin.Context) {
 	pass, err := h.svc.GeneratePassword()
 	if err != nil {
-		c.String(http.StatusInternalServerError, "err")
+		responErr(c, http.StatusInternalServerError, "internal server error")
 		return
 	}
 
-	c.String(http.StatusOK, pass)
+	c.JSON(http.StatusOK, genPassResponse{
+		Password: pass,
+	})
 }

@@ -36,7 +36,7 @@ func TestPasswordHandler_GenPass(t *testing.T) {
 			},
 
 			expectedStatus: http.StatusOK,
-			expectedResp:   "123456789",
+			expectedResp:   `{"password":"123456789"}`,
 		},
 		{
 			name: "internal server err",
@@ -51,7 +51,7 @@ func TestPasswordHandler_GenPass(t *testing.T) {
 			},
 
 			expectedStatus: http.StatusInternalServerError,
-			expectedResp:   "err",
+			expectedResp:   `{"error":"internal server error"}`,
 		},
 	}
 

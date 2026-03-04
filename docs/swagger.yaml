@@ -1,4 +1,15 @@
-basePath: /api/v1
+basePath: /
+definitions:
+  handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handler.SuccessResponse:
+    properties:
+      password:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
