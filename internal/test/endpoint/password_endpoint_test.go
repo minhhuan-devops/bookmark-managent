@@ -1,7 +1,7 @@
 package endpoint
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -35,7 +35,7 @@ func TestPasswordEndpoint(t *testing.T) {
 			},
 
 			expectedStatus: http.StatusOK,
-			expectedLen:    31, //Vì là json nên len dài hơn
+			expectedLen:    16, //Vì là json nên len dài hơn
 		},
 	}
 
@@ -47,10 +47,13 @@ func TestPasswordEndpoint(t *testing.T) {
 
 			rec := tc.setupTestHTTP(app)
 
-			fmt.Println(rec.Body)
+			var response struct {
+				Password string `json:"password"`
+			}
+			json.Unmarshal(rec.Body.Bytes(), &response)
 
 			assert.Equal(t, tc.expectedStatus, rec.Code)
-			assert.Equal(t, tc.expectedLen, len(rec.Body.String()))
+			assert.Equal(t, tc.expectedLen, len(response.Password))
 		})
 	}
 }

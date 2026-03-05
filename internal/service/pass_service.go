@@ -9,7 +9,7 @@ import (
 const (
 	// charset defines the set of characters used for password generation,
 	// including lowercase, uppercase, digits, and special characters.
-	charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+"
+	charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	// passLength defines the fixed length of generated passwords.
 	passLength = 16
 )
