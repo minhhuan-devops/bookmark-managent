@@ -8,9 +8,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	_ "github.com/senn404/bookmark-managent/docs"
 	"github.com/senn404/bookmark-managent/internal/config"
 	"github.com/senn404/bookmark-managent/internal/handler"
+	"github.com/senn404/bookmark-managent/internal/repository"
 	"github.com/senn404/bookmark-managent/internal/service"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -30,8 +32,9 @@ type Engine interface {
 // api is the concrete implementation of the Engine interface. It wraps
 // a Gin engine and the application configuration.
 type api struct {
-	app *gin.Engine
-	cfg *config.Config
+	app         *gin.Engine
+	cfg         *config.Config
+	redisClient *redis.Client
 }
 
 // Start starts the HTTP server on the port specified in the application configuration.
@@ -51,13 +54,23 @@ func (a *api) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // It initializes the service layer and handler layer using dependency injection,
 // and maps each handler to its corresponding HTTP route.
 func (a *api) registerEP() {
+	// Create Handler
+	//passwork handler
 	passSvc := service.NewPassword()
 	passHandler := handler.NewPasswordHandler(passSvc)
-	a.app.GET("/gen-pass", passHandler.GenPass)
-
+	//healthcheck handler
 	healthCheck := service.NewHealthCheck(a.cfg)
 	healthCheckHandler := handler.NewHealthCheckHandler(healthCheck)
+	//url shorten handler
+	urlStorage := repository.NewURLStorage(a.redisClient)
+	urlService := service.NewShortenURLService(urlStorage)
+	urlHandler := handler.NewShortenURLHandler(urlService)
+
+	a.app.GET("/gen-pass", passHandler.GenPass)
 	a.app.GET("/health-check", healthCheckHandler.HealthCheck)
+	a.app.POST("/shorten-url", urlHandler.ShortenURL)
+
+	//URL Storage
 
 	a.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
@@ -65,10 +78,11 @@ func (a *api) registerEP() {
 // New creates a new Engine instance with the given configuration.
 // It initializes the Gin router with default middleware (logger and recovery),
 // registers all endpoint handlers, and returns the Engine ready to start.
-func New(cfg *config.Config) Engine {
+func New(cfg *config.Config, redisClient *redis.Client) Engine {
 	a := &api{
-		app: gin.Default(),
-		cfg: cfg,
+		app:         gin.Default(),
+		cfg:         cfg,
+		redisClient: redisClient,
 	}
 	a.registerEP()
 	return a

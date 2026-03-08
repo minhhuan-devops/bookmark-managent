@@ -5,6 +5,7 @@ package main
 import (
 	"github.com/senn404/bookmark-managent/internal/api"
 	"github.com/senn404/bookmark-managent/internal/config"
+	"github.com/senn404/bookmark-managent/internal/pkg/redis"
 )
 
 // @title Bookmark Management API
@@ -22,7 +23,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	app := api.New(cfg)
+	redisClient, err := redis.NewClient("")
+	if err != nil {
+		panic(err)
+	}
+	app := api.New(cfg, redisClient)
 	app.Start()
 }

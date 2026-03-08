@@ -5,7 +5,6 @@ package endpoint
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/senn404/bookmark-managent/internal/api"
 	"github.com/senn404/bookmark-managent/internal/config"
+	pkgRedis "github.com/senn404/bookmark-managent/internal/pkg/redis"
 	"github.com/senn404/bookmark-managent/internal/service"
 )
 
@@ -56,14 +56,13 @@ func TestHealthCheckEndpoint(t *testing.T) {
 				ServiceName: "bookmark_service",
 				InstanceID:  "7dee4e26-66fd-44c1-a135-fe4ce9e4b8aa",
 			}
+			redisClient, _ := pkgRedis.NewClient("")
 
-			app := api.New(&cfg)
+			app := api.New(&cfg, redisClient)
 
 			rec := tc.setupTestHTTP(app)
 
 			assert.Equal(t, tc.expectedStatus, rec.Code)
-
-			fmt.Println("Response Body:", rec.Body.String())
 
 			var body service.HealthStatus
 			json.Unmarshal(rec.Body.Bytes(), &body)

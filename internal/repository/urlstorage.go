@@ -12,7 +12,7 @@ const (
 )
 
 type URLStorage interface {
-	StoreURL(ctx context.Context, code, url string) error
+	StoreURL(ctx context.Context, code, url string, expTime time.Duration) (string, error)
 }
 
 type urlStorage struct {
@@ -26,6 +26,9 @@ func NewURLStorage(redisClent *redis.Client) URLStorage {
 }
 
 //go:generate mockery --name URLStorage --filename URLStorage.go
-func (s *urlStorage) StoreURL(ctx context.Context, code, url string) error {
-	return s.redisClient.Set(ctx, code, url, urlExpTime).Err()
+func (s *urlStorage) StoreURL(ctx context.Context, code, url string, expTime time.Duration) (string, error) {
+	return s.redisClient.SetArgs(ctx, code, url, redis.SetArgs{
+		Mode: "NX",
+		TTL:  expTime,
+	}).Result()
 }

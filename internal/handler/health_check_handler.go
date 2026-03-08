@@ -36,7 +36,7 @@ func NewHealthCheckHandler(svc service.HealthCheck) HealthCheckHandler {
 // @Summary Health Check
 // @Tags health-check
 // @Produce json
-// @Success 200 {object} healthCheckResponse
+// @Success 200 {object} string
 // @Failure 500 {object} errorResponse
 // @Router /health-check [get]
 func (h *healthCheckHandler) HealthCheck(c *gin.Context) {

@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/rand"
 	"math/big"
+	"time"
 
 	"github.com/senn404/bookmark-managent/internal/repository"
 )
@@ -18,6 +19,7 @@ type shortenURL struct {
 }
 
 type ShortenURLService interface {
+	ShortenURL(ctx context.Context, url string, expTime time.Duration) (string, error)
 }
 
 func NewShortenURLService(urlStorage repository.URLStorage) ShortenURLService {
@@ -26,7 +28,7 @@ func NewShortenURLService(urlStorage repository.URLStorage) ShortenURLService {
 	}
 }
 
-func (s *shortenURL) ShortenURL(ctx context.Context, url string) (string, error) {
+func (s *shortenURL) generateURL() (string, error) {
 	var urlShorten bytes.Buffer
 
 	for i := 1; i <= urlLength; i++ {
@@ -36,8 +38,23 @@ func (s *shortenURL) ShortenURL(ctx context.Context, url string) (string, error)
 		}
 		urlShorten.WriteByte(charset[randomIndex.Int64()])
 	}
-
-	s.urlStorage.StoreURL(ctx, urlShorten.String(), url)
-
 	return urlShorten.String(), nil
+}
+
+//go:generate mockery --name ShortenURLService --filename shorten_url.go
+func (s *shortenURL) ShortenURL(ctx context.Context, url string, expTime time.Duration) (string, error) {
+	for {
+		urlResponse, err := s.generateURL()
+		if err != nil {
+			return "", err
+		}
+		check, err := s.urlStorage.StoreURL(ctx, urlResponse, url, expTime)
+		if err != nil {
+			return "", err
+		}
+		if check == "OK" {
+			return urlResponse, nil
+		}
+		urlResponse, err = s.generateURL()
+	}
 }

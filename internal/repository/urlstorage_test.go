@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/go-playground/assert/v2"
 	"github.com/redis/go-redis/v9"
@@ -15,12 +16,14 @@ func TestURLStorage(t *testing.T) {
 	testCase := []struct {
 		name string
 
-		setupMock func() *redis.Client
-		inputCode string
-		inputURL  string
+		setupMock    func() *redis.Client
+		inputCode    string
+		inputURL     string
+		inputExpTime time.Duration
 
-		expectedErr error
-		verifyFunc  func(ctx context.Context, r *redis.Client, inputCode, inputURL string)
+		expectedErr   error
+		expectedCheck string
+		verifyFunc    func(ctx context.Context, r *redis.Client, inputCode, inputURL string, expectedErr error, expectedCheck string)
 	}{
 		{
 			name: "normal case",
@@ -29,14 +32,18 @@ func TestURLStorage(t *testing.T) {
 				mock := redisPkg.InitMockRedis(t)
 				return mock
 			},
-			inputURL:  "huanops.com",
-			inputCode: "12345",
+			inputURL:     "huanops.com",
+			inputCode:    "12345",
+			inputExpTime: time.Hour,
 
-			expectedErr: nil,
-			verifyFunc: func(ctx context.Context, r *redis.Client, inputCode, inputURL string) {
+			expectedErr:   nil,
+			expectedCheck: "OK",
+
+			verifyFunc: func(ctx context.Context, r *redis.Client, inputCode, inputURL string, expectedErr error, expectedCheck string) {
 				res, err := r.Get(ctx, inputCode).Result()
-				assert.Equal(t, nil, err)
+				assert.Equal(t, expectedErr, err)
 				assert.Equal(t, inputURL, res)
+
 			},
 		},
 	}
@@ -48,10 +55,11 @@ func TestURLStorage(t *testing.T) {
 			redisClient := *tc.setupMock()
 
 			urlStorage := NewURLStorage(&redisClient)
-			err := urlStorage.StoreURL(ctx, tc.inputCode, tc.inputURL)
+			check, err := urlStorage.StoreURL(ctx, tc.inputCode, tc.inputURL, tc.inputExpTime)
 			if err == nil {
-				tc.verifyFunc(ctx, &redisClient, tc.inputCode, tc.inputURL)
+				tc.verifyFunc(ctx, &redisClient, tc.inputCode, tc.inputURL, tc.expectedErr, tc.expectedCheck)
 			}
+			assert.Equal(t, tc.expectedCheck, check)
 		})
 	}
 }

@@ -10,13 +10,18 @@ definitions:
       password:
         type: string
     type: object
-  handler.healthCheckResponse:
+  handler.shortenURLRequest:
     properties:
-      instace_id:
+      exp_time:
+        type: integer
+      url:
+        type: string
+    type: object
+  handler.shortenURLResponse:
+    properties:
+      code:
         type: string
       message:
-        type: string
-      service_name:
         type: string
     type: object
 host: localhost:8080
@@ -28,21 +33,18 @@ info:
 paths:
   /gen-pass:
     get:
-      consumes:
-      - application/json
-      description: GeneratePassword
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/handler.genPassResponse'
         "500":
           description: Internal Server Error
           schema:
-            type: string
-      summary: GeneratePassword
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Generate Password
       tags:
       - password
   /health-check:
@@ -53,7 +55,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.healthCheckResponse'
+            type: string
         "500":
           description: Internal Server Error
           schema:
@@ -61,6 +63,35 @@ paths:
       summary: Health Check
       tags:
       - health-check
+  /shorten-url:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: URL to shorten
+        in: body
+        name: url
+        required: true
+        schema:
+          $ref: '#/definitions/handler.shortenURLRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.shortenURLResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Shorten URL
+      tags:
+      - URL Shortener
 schemes:
 - http
 swagger: "2.0"
