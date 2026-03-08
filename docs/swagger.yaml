@@ -24,6 +24,18 @@ definitions:
       message:
         type: string
     type: object
+  service.HealthStatus:
+    properties:
+      instance_id:
+        description: InstanceId is the unique identifier of this running instance.
+        type: string
+      message:
+        description: Message indicates the overall health state (e.g., "OK").
+        type: string
+      service_name:
+        description: ServiceName is the name of the service as configured.
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -55,7 +67,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/service.HealthStatus'
         "500":
           description: Internal Server Error
           schema:

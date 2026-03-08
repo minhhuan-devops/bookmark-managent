@@ -53,7 +53,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/service.HealthStatus"
                         }
                     },
                     "500": {
@@ -146,6 +146,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.HealthStatus": {
+            "type": "object",
+            "properties": {
+                "instance_id": {
+                    "description": "InstanceId is the unique identifier of this running instance.",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "Message indicates the overall health state (e.g., \"OK\").",
+                    "type": "string"
+                },
+                "service_name": {
+                    "description": "ServiceName is the name of the service as configured.",
                     "type": "string"
                 }
             }
