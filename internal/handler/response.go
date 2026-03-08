@@ -14,6 +14,9 @@ type errorResponse struct {
 	Error string `json:"error"`
 }
 
+// shortenURLResponse represents the JSON response body for a successful URL shortening request.
+// Code is the generated short code that identifies the original URL.
+// Message is a human-readable success message.
 type shortenURLResponse struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
