@@ -17,6 +17,8 @@ func TestShortenURL(t *testing.T) {
 		url     string
 		expTime time.Duration
 
+		setupMock func() *mocks.URLStorage
+
 		expectedErr error
 		expectedLen int
 	}{
@@ -24,6 +26,12 @@ func TestShortenURL(t *testing.T) {
 			name:    "normal case",
 			url:     "huanops.com",
 			expTime: 10,
+
+			setupMock: func() *mocks.URLStorage {
+				mockURLStorage := mocks.NewURLStorage(t)
+				mockURLStorage.On("StoreURL", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("OK", nil)
+				return mockURLStorage
+			},
 
 			expectedErr: nil,
 			expectedLen: 9,
@@ -33,8 +41,7 @@ func TestShortenURL(t *testing.T) {
 	for _, tc := range testCase {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			mockURLStorage := mocks.NewURLStorage(t)
-			mockURLStorage.On("StoreURL", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("OK", nil)
+			mockURLStorage := tc.setupMock()
 			testSvc := NewShortenURLService(mockURLStorage)
 
 			respon, err := testSvc.ShortenURL(t.Context(), tc.url, tc.expTime)

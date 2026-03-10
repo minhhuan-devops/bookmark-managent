@@ -58,14 +58,14 @@ func (s *shortenURLHandler) ShortenURL(c *gin.Context) {
 		return
 	}
 
-	key, err := s.shortenURLService.ShortenURL(c, input.URL, time.Duration(input.ExpTime)*time.Minute)
+	key, err := s.shortenURLService.ShortenURL(c, input.URL, time.Duration(input.ExpTime)*time.Second)
 	if err != nil {
 		responErr(c, http.StatusInternalServerError, "internal server error")
 		return
 	}
 
 	c.JSON(http.StatusOK, shortenURLResponse{
-		Code: key,
+		Code:    key,
 		Message: "Shorten URL generated successfully!",
 	})
 }

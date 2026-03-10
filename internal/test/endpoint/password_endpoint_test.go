@@ -9,7 +9,6 @@ import (
 	"github.com/go-playground/assert/v2"
 	"github.com/senn404/bookmark-managent/internal/api"
 	"github.com/senn404/bookmark-managent/internal/config"
-	pkgRedis "github.com/senn404/bookmark-managent/internal/pkg/redis"
 )
 
 // TestPasswordEndpoint is an integration test that verifies the /gen-pass
@@ -44,9 +43,7 @@ func TestPasswordEndpoint(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			redisClient, _ := pkgRedis.NewClient("")
-
-			app := api.New(&config.Config{}, redisClient)
+			app := api.New(&config.Config{}, nil)
 
 			rec := tc.setupTestHTTP(app)
 

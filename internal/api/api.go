@@ -69,7 +69,7 @@ func (a *api) registerEP() {
 
 	a.app.GET("/gen-pass", passHandler.GenPass)
 	a.app.GET("/health-check", healthCheckHandler.HealthCheck)
-	a.app.POST("/shorten-url", urlHandler.ShortenURL)
+	a.app.POST("/shorten", urlHandler.ShortenURL)
 
 	//URL Storage
 

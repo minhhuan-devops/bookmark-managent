@@ -71,6 +71,5 @@ func (s *shortenURL) ShortenURL(ctx context.Context, url string, expTime time.Du
 		if check == "OK" {
 			return urlResponse, nil
 		}
-		urlResponse, err = s.generateURL()
 	}
 }

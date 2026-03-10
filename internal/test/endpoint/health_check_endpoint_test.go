@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-playground/assert/v2"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"github.com/senn404/bookmark-managent/internal/api"
 	"github.com/senn404/bookmark-managent/internal/config"
 	pkgRedis "github.com/senn404/bookmark-managent/internal/pkg/redis"
@@ -26,7 +27,8 @@ func TestHealthCheckEndpoint(t *testing.T) {
 	testCase := []struct {
 		name string
 
-		setupTestHTTP func(api api.Engine) *httptest.ResponseRecorder
+		setupTestHTTP  func(api api.Engine) *httptest.ResponseRecorder
+		setupMockRedis func() *redis.Client
 
 		expectedStatus      int
 		expectedMessage     string
@@ -39,6 +41,9 @@ func TestHealthCheckEndpoint(t *testing.T) {
 				respRecorder := httptest.NewRecorder()
 				api.ServeHTTP(respRecorder, req)
 				return respRecorder
+			},
+			setupMockRedis: func() *redis.Client {
+				return pkgRedis.InitMockRedis(t)
 			},
 
 			expectedStatus:      http.StatusOK,
@@ -56,7 +61,7 @@ func TestHealthCheckEndpoint(t *testing.T) {
 				ServiceName: "bookmark_service",
 				InstanceID:  "7dee4e26-66fd-44c1-a135-fe4ce9e4b8aa",
 			}
-			redisClient, _ := pkgRedis.NewClient("")
+			redisClient := tc.setupMockRedis()
 
 			app := api.New(&cfg, redisClient)
 

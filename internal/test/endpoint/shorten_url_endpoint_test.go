@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/go-playground/assert/v2"
+	"github.com/redis/go-redis/v9"
 	"github.com/senn404/bookmark-managent/internal/api"
 	"github.com/senn404/bookmark-managent/internal/config"
 	pkgRedis "github.com/senn404/bookmark-managent/internal/pkg/redis"
@@ -32,7 +33,8 @@ func TestShortenURLEndpoint(t *testing.T) {
 	testCase := []struct {
 		name string
 
-		setupTestHTTP func(api api.Engine) *httptest.ResponseRecorder
+		setupTestHTTP  func(api api.Engine) *httptest.ResponseRecorder
+		setupMockRedis func() *redis.Client
 
 		expectedStatus int
 		expectedRespon shortenURLResponse
@@ -46,10 +48,14 @@ func TestShortenURLEndpoint(t *testing.T) {
 					"exp_time": 60,
 				})
 
-				req := httptest.NewRequest(http.MethodPost, "/shorten-url", bytes.NewBuffer(body))
+				req := httptest.NewRequest(http.MethodPost, "/shorten", bytes.NewBuffer(body))
 				respRecorder := httptest.NewRecorder()
 				api.ServeHTTP(respRecorder, req)
 				return respRecorder
+			},
+
+			setupMockRedis: func() *redis.Client {
+				return pkgRedis.InitMockRedis(t)
 			},
 
 			expectedStatus: http.StatusOK,
@@ -64,7 +70,7 @@ func TestShortenURLEndpoint(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			redisClient, _ := pkgRedis.NewClient("")
+			redisClient := tc.setupMockRedis()
 
 			app := api.New(&config.Config{}, redisClient)
 
