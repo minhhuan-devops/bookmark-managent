@@ -69,9 +69,8 @@ func (a *api) registerEP() {
 
 	a.app.GET("/gen-pass", passHandler.GenPass)
 	a.app.GET("/health-check", healthCheckHandler.HealthCheck)
-	a.app.POST("/shorten", urlHandler.ShortenURL)
-
-	//URL Storage
+	a.app.POST("/links/shorten", urlHandler.ShortenURL)
+	a.app.GET("/links/redirect/:code", urlHandler.GetURL)
 
 	a.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

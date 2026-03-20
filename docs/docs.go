@@ -65,7 +65,47 @@ const docTemplate = `{
                 }
             }
         },
-        "/shorten-url": {
+        "/links/redirect/{code}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "URL Shortener"
+                ],
+                "summary": "Get Original URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Shortened URL code",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "301": {
+                        "description": "Redirect to original URL",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/links/shorten": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -92,7 +132,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.shortenURLResponse"
+                            "$ref": "#/definitions/handler.shortenURLRequest"
                         }
                     },
                     "400": {
@@ -130,22 +170,16 @@ const docTemplate = `{
         },
         "handler.shortenURLRequest": {
             "type": "object",
+            "required": [
+                "exp_time",
+                "url"
+            ],
             "properties": {
                 "exp_time": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.shortenURLResponse": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "message": {
                     "type": "string"
                 }
             }

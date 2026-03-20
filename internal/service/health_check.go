@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/senn404/bookmark-managent/internal/config"
 	"github.com/senn404/bookmark-managent/internal/repository"
 )
@@ -61,6 +62,7 @@ func NewHealthCheck(cfg *config.Config, htc repository.HealthCheckRedis) HealthC
 // including the service name, instance ID, and health message.
 func (h *healthCheck) GetStatus(ctx context.Context) (status HealthStatus) {
 	if err := h.HealthCheckRedis.HealthCheck(ctx); err != nil {
+		log.Error().Err(err).Msg("Redis health check failed")
 		h.status.Message = "Internal Server Error"
 	}
 	return h.status

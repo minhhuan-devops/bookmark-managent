@@ -17,6 +17,7 @@ type URLStorage interface {
 	// It uses the NX (set-if-not-exists) mode to avoid overwriting existing codes.
 	// It returns "OK" if the code was successfully stored, or an error on failure.
 	StoreURL(ctx context.Context, code, url string, expTime time.Duration) (string, error)
+	GetURL(ctx context.Context, code string) (string, error)
 }
 
 // urlStorage is the concrete implementation of URLStorage.
@@ -40,4 +41,8 @@ func (s *urlStorage) StoreURL(ctx context.Context, code, url string, expTime tim
 		Mode: "NX",
 		TTL:  expTime,
 	}).Result()
+}
+
+func (s *urlStorage) GetURL(ctx context.Context, code string) (string, error) {
+	return s.redisClient.Get(ctx, code).Result()
 }

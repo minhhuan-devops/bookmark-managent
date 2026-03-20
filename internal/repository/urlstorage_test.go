@@ -43,7 +43,6 @@ func TestURLStorage(t *testing.T) {
 				res, err := r.Get(ctx, inputCode).Result()
 				assert.Equal(t, expectedErr, err)
 				assert.Equal(t, inputURL, res)
-
 			},
 		},
 	}
@@ -60,6 +59,61 @@ func TestURLStorage(t *testing.T) {
 				tc.verifyFunc(ctx, &redisClient, tc.inputCode, tc.inputURL, tc.expectedErr, tc.expectedCheck)
 			}
 			assert.Equal(t, tc.expectedCheck, check)
+		})
+	}
+}
+
+func TestGetURL(t *testing.T) {
+	t.Parallel()
+
+	testCase := []struct {
+		name string
+
+		setupMock func() *redis.Client
+		inputCode string
+
+		expectedErr error
+		expectedURL string
+
+		verifyFunc func(ctx context.Context, r *redis.Client, inputCode string, expectedErr error, expectedURL string)
+	}{
+		{
+			name: "normal case",
+
+			setupMock: func() *redis.Client {
+				client := redisPkg.InitMockRedis(t)
+				client.Set(t.Context(), "12345", "https://huanops.com", time.Hour)
+				return client
+			},
+			inputCode: "12345",
+
+			expectedErr: nil,
+			expectedURL: "https://huanops.com",
+		},
+		{
+			name: "code not exists",
+
+			setupMock: func() *redis.Client {
+				mock := redisPkg.InitMockRedis(t)
+				return mock
+			},
+			inputCode: "notfound",
+
+			expectedErr: redis.Nil,
+			expectedURL: "",
+		},
+	}
+
+	for _, tc := range testCase {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			ctx := t.Context()
+			redisClient := *tc.setupMock()
+
+			urlStorage := NewURLStorage(&redisClient)
+			respon, err := urlStorage.GetURL(ctx, tc.inputCode)
+			assert.Equal(t, tc.expectedURL, respon)
+			assert.Equal(t, tc.expectedErr, err)
 		})
 	}
 }
