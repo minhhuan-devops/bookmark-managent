@@ -12,13 +12,16 @@ import (
 // from environment variables, with fallback to the specified default values.
 type Config struct {
 	// AppPort is the port number the HTTP server listens on.
-	AppPort     string `default:"8080" envconfig:"APP_PORT"`
+	AppPort string `default:"8080" envconfig:"APP_PORT"`
 	// ServiceName is the name used to identify this service in health checks
 	// and monitoring.
 	ServiceName string `default:"bookmark_service" envconfig:"SERVICE_NAME"`
 	// InstanceID is a unique identifier for this running instance. If left
 	// empty, a UUID will be auto-generated at startup.
-	InstanceID  string `default:"" envconfig:"INSTANCE_ID"`
+	InstanceID string `default:"" envconfig:"INSTANCE_ID"`
+	// SwaggerHost is the host shown in Swagger UI
+	// If empty, defaults to localhost:8080.
+	SwaggerHost string `default:"" envconfig:"SWAGGER_HOST"`
 }
 
 // NewConfig creates a new Config by loading a .env file (if present) and

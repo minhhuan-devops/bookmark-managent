@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
-	_ "github.com/senn404/bookmark-managent/docs"
+	"github.com/senn404/bookmark-managent/docs"
 	"github.com/senn404/bookmark-managent/internal/config"
 	"github.com/senn404/bookmark-managent/internal/handler"
 	"github.com/senn404/bookmark-managent/internal/repository"
@@ -71,6 +71,12 @@ func (a *api) registerEP() {
 	a.app.GET("/health-check", healthCheckHandler.HealthCheck)
 	a.app.POST("/links/shorten", urlHandler.ShortenURL)
 	a.app.GET("/links/redirect/:code", urlHandler.GetURL)
+
+	// Override Swagger host if configured (e.g., for API Gateway deployment)
+	if a.cfg.SwaggerHost != "" {
+		docs.SwaggerInfo.Host = a.cfg.SwaggerHost
+		docs.SwaggerInfo.Schemes = []string{"https"}
+	}
 
 	a.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

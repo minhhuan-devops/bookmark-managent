@@ -2,7 +2,11 @@
 // It loads connection settings from environment variables.
 package redis
 
-import "github.com/redis/go-redis/v9"
+import (
+	"crypto/tls"
+
+	"github.com/redis/go-redis/v9"
+)
 
 // NewClient creates a new Redis client using configuration loaded from environment variables.
 // The envPrefix parameter is used to namespace the environment variable names.
@@ -14,9 +18,17 @@ func NewClient(envPrefix string) (*redis.Client, error) {
 		return nil, err
 	}
 
-	return redis.NewClient(&redis.Options{
-		Addr:     cfg.Address,
+	opts := &redis.Options{
+		Addr:     cfg.Address + ":" + cfg.Port,
 		Password: cfg.Password,
 		DB:       cfg.DB,
-	}), nil
+	}
+
+	if cfg.UseTLS {
+		opts.TLSConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
+	}
+
+	return redis.NewClient(opts), nil
 }
