@@ -27,9 +27,9 @@ type urlStorage struct {
 }
 
 // NewURLStorage creates a new URLStorage with the given Redis client.
-func NewURLStorage(redisClent *redis.Client) URLStorage {
+func NewURLStorage(redisClient *redis.Client) URLStorage {
 	return &urlStorage{
-		redisClient: redisClent,
+		redisClient: redisClient,
 	}
 }
 

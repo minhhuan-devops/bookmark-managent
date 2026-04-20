@@ -16,6 +16,8 @@ import (
 const (
 	// urlLength defines the fixed length of the generated short URL code.
 	urlLength = 9
+	// urlCharset is separate from password charset so changing either does not affect the other.
+	urlCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 // shortenURL is the concrete implementation of ShortenURLService.
@@ -49,11 +51,11 @@ func (s *shortenURL) generateURL() (string, error) {
 	var urlShorten bytes.Buffer
 
 	for i := 1; i <= urlLength; i++ {
-		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(urlCharset))))
 		if err != nil {
 			return "", err
 		}
-		urlShorten.WriteByte(charset[randomIndex.Int64()])
+		urlShorten.WriteByte(urlCharset[randomIndex.Int64()])
 	}
 	return urlShorten.String(), nil
 }

@@ -7,7 +7,7 @@ services:
     environment:
       - APP_PORT=8080
       - SERVICE_NAME=bookmark_service
-      - REDIS_ADDRESS=redis:6379
+      - REDIS_ADDRESS=redis
       - REDIS_PASSWORD=
       - REDIS_DB=0
     depends_on:

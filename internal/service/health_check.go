@@ -61,9 +61,10 @@ func NewHealthCheck(cfg *config.Config, htc repository.HealthCheckRedis) HealthC
 // GetStatus returns the pre-computed health status of the service,
 // including the service name, instance ID, and health message.
 func (h *healthCheck) GetStatus(ctx context.Context) (status HealthStatus) {
+	status = h.status
 	if err := h.HealthCheckRedis.HealthCheck(ctx); err != nil {
 		log.Error().Err(err).Msg("Redis health check failed")
-		h.status.Message = "Internal Server Error"
+		status.Message = "Internal Server Error"
 	}
-	return h.status
+	return status
 }

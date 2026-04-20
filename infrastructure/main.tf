@@ -186,7 +186,7 @@ module "ecs" {
               value = tostring(module.valkey_cache.replication_group_port)
             },
             {
-              name  = "PORT"
+              name  = "APP_PORT"
               value = "8080"
             },
             {
@@ -281,7 +281,7 @@ module "api_gateway" {
         vpc_link_key    = "ecs-vpc-link"
       }
     }
-    "POST /links/shorten" = {
+    "POST /links/{proxy+}" = {
       integration = {
         connection_type = "VPC_LINK"
         uri             = module.loadbalancer.listeners["http"].arn
@@ -293,7 +293,7 @@ module "api_gateway" {
     "GET /links/redirect/{code}" = { # ← {code} thay vì :code
       integration = {
         connection_type = "VPC_LINK"
-        uri             = module.loadblance.listeners["http"].arn
+        uri             = module.loadbalancer.listeners["http"].arn
         type            = "HTTP_PROXY"
         method          = "GET"
         vpc_link_key    = "ecs-vpc-link"
