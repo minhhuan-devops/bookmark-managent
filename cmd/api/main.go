@@ -3,8 +3,10 @@
 package main
 
 import (
+	"github.com/rs/zerolog/log"
 	"github.com/senn404/bookmark-managent/internal/api"
 	"github.com/senn404/bookmark-managent/internal/config"
+	"github.com/senn404/bookmark-managent/internal/pkg/logger"
 	"github.com/senn404/bookmark-managent/internal/pkg/redis"
 )
 
@@ -19,14 +21,21 @@ import (
 // and starts the Bookmark Management API server. It panics if the configuration
 // cannot be loaded.
 func main() {
+	logger.SetLogLevel()
+
 	cfg, err := config.NewConfig("")
 	if err != nil {
-		panic(err)
+		log.Fatal().Err(err).Msg("Failed to load config")
 	}
 	redisClient, err := redis.NewClient("")
 	if err != nil {
-		panic(err)
+		log.Fatal().Err(err).Msg("Failed to connect to redis")
 	}
+
+	log.Info().Str("port", cfg.AppPort).Msg("Starting server")
+
 	app := api.New(cfg, redisClient)
-	app.Start()
+	if err := app.Start(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to start server")
+	}
 }

@@ -1,2 +1,8 @@
 .vscode
 /cmd/test
+
+.terraform
+.terraform.lock.hcl
+infrastructure/.terraform.tfstate.lock.info
+infrastructure/terraform.tfstate
+infrastructure/terraform.tfstate.backup

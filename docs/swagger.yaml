@@ -13,16 +13,13 @@ definitions:
   handler.shortenURLRequest:
     properties:
       exp_time:
+        minimum: 1
         type: integer
       url:
         type: string
-    type: object
-  handler.shortenURLResponse:
-    properties:
-      code:
-        type: string
-      message:
-        type: string
+    required:
+    - exp_time
+    - url
     type: object
   service.HealthStatus:
     properties:
@@ -75,7 +72,33 @@ paths:
       summary: Health Check
       tags:
       - health-check
-  /shorten-url:
+  /links/redirect/{code}:
+    get:
+      parameters:
+      - description: Shortened URL code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "301":
+          description: Redirect to original URL
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Original URL
+      tags:
+      - URL Shortener
+  /links/shorten:
     post:
       consumes:
       - application/json
@@ -92,7 +115,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.shortenURLResponse'
+            $ref: '#/definitions/handler.shortenURLRequest'
         "400":
           description: Bad Request
           schema:

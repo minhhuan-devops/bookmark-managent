@@ -1,0 +1,39 @@
+# Version control
+.git
+.gitignore
+
+# IDE & editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Documentation & coverage
+README.md
+ErrorColection
+cover.out
+cover.html
+docs
+
+# Environment (secrets should be passed via env vars, not baked into image)
+.env
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test files
+*_test.go
+internal/test
+internal/pkg/redis/mock.go
+internal/mocks
+
+# Gemini
+.gemini
+infrastructure

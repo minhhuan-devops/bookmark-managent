@@ -5,15 +5,19 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"errors"
 	"math/big"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/senn404/bookmark-managent/internal/repository"
 )
 
 const (
 	// urlLength defines the fixed length of the generated short URL code.
 	urlLength = 9
+	// urlCharset is separate from password charset so changing either does not affect the other.
+	urlCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 // shortenURL is the concrete implementation of ShortenURLService.
@@ -29,6 +33,7 @@ type ShortenURLService interface {
 	// ShortenURL stores the given URL with the specified expiration and returns a unique short code.
 	// It retries automatically if the generated code already exists in storage.
 	ShortenURL(ctx context.Context, url string, expTime time.Duration) (string, error)
+	GetURL(ctx context.Context, code string) (string, error)
 }
 
 // NewShortenURLService creates a new ShortenURLService with the given URLStorage.
@@ -46,11 +51,11 @@ func (s *shortenURL) generateURL() (string, error) {
 	var urlShorten bytes.Buffer
 
 	for i := 1; i <= urlLength; i++ {
-		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(urlCharset))))
 		if err != nil {
 			return "", err
 		}
-		urlShorten.WriteByte(charset[randomIndex.Int64()])
+		urlShorten.WriteByte(urlCharset[randomIndex.Int64()])
 	}
 	return urlShorten.String(), nil
 }
@@ -72,4 +77,19 @@ func (s *shortenURL) ShortenURL(ctx context.Context, url string, expTime time.Du
 			return urlResponse, nil
 		}
 	}
+}
+
+var ErrCodeNotExist = errors.New("code not exists")
+
+func (s *shortenURL) GetURL(ctx context.Context, code string) (string, error) {
+	// call repo -> url
+	url, err := s.urlStorage.GetURL(ctx, code)
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return "", ErrCodeNotExist
+		}
+		return "", err
+	}
+	//return url
+	return url, nil
 }

@@ -10,3 +10,9 @@ test:
 	- go test ./... -coverprofile=cover.out
 	grep -v "${COVERAGE_EXCLUDE}" cover.out > cover.tmp && mv cover.tmp cover.out
 	go tool cover -html=cover.out -o cover.html
+dbuild:
+	docker compose up -d
+drebuild:
+	docker compose up -d --build
+ddown:
+	docker compose down
